@@ -2,7 +2,7 @@ environment = "dev"
 
 vpc_cidr = "10.10.0.0/16"
 
-eks_node_count = 1
+eks_node_count = 2
 
 eks_node_min_size = 1
 
