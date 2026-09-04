@@ -1,0 +1,43 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        env: [dev, staging, production]
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Connect to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::958124171439:role/github-actions-terraform
+          aws-region: ap-south-1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform/environments/${{ matrix.env }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform/environments/${{ matrix.env }}
+
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: terraform/environments/${{ matrix.env }}
